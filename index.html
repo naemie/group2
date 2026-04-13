@@ -28,7 +28,7 @@
                 This 40-item multiple-choice test strictly evaluates your knowledge based on the provided Respiratory System reviewer. 
                 Questions and options are randomized every time you take the test. Detailed feedback is provided for all choices upon answering.
             </p>
-            <button onclick="startQuiz()" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg w-full md:w-auto">
+            <button id="start-btn" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg w-full md:w-auto">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                 Start Mock Test
             </button>
@@ -65,7 +65,7 @@
 
             <!-- Next Button Container -->
             <div id="next-button-container" class="flex justify-end hidden fade-in">
-                <button onclick="handleNextQuestion()" id="next-btn" class="inline-flex w-full md:w-auto justify-center items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md">
+                <button id="next-btn" class="inline-flex w-full md:w-auto justify-center items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md">
                     <span>Next Question</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
@@ -86,7 +86,7 @@
                 </p>
             </div>
 
-            <button onclick="startQuiz()" class="inline-flex w-full md:w-auto justify-center items-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-full transition-all shadow-lg">
+            <button id="retake-btn" class="inline-flex w-full md:w-auto justify-center items-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-full transition-all shadow-lg">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
                 Retake Test
             </button>
@@ -464,17 +464,19 @@
         let selectedOptionIndex = null;
         let score = 0;
 
-        // DOM Elements
-        const introView = document.getElementById('intro-view');
-        const quizView = document.getElementById('quiz-view');
-        const resultsView = document.getElementById('results-view');
-        
-        const progressText = document.getElementById('progress-text');
-        const progressBar = document.getElementById('progress-bar');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const nextButtonContainer = document.getElementById('next-button-container');
-        const nextBtn = document.getElementById('next-btn');
+        // SVG Icons
+        const icons = {
+            check: `<svg class="w-6 h-6 text-green-600 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+            cross: `<svg class="w-6 h-6 text-red-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`
+        };
+
+        // Initialize when DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Bind Buttons
+            document.getElementById('start-btn').addEventListener('click', startQuiz);
+            document.getElementById('retake-btn').addEventListener('click', startQuiz);
+            document.getElementById('next-btn').addEventListener('click', handleNextQuestion);
+        });
 
         // Utility to shuffle array
         function shuffleArray(array) {
@@ -485,12 +487,6 @@
             }
             return newArray;
         }
-
-        // SVG Icons
-        const icons = {
-            check: `<svg class="w-6 h-6 text-green-600 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
-            cross: `<svg class="w-6 h-6 text-red-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`
-        };
 
         function startQuiz() {
             // Shuffle questions and their options
@@ -503,27 +499,28 @@
             score = 0;
             
             // Switch views
-            introView.classList.add('hidden');
-            resultsView.classList.add('hidden');
-            quizView.classList.remove('hidden');
+            document.getElementById('intro-view').classList.add('hidden');
+            document.getElementById('results-view').classList.add('hidden');
+            document.getElementById('quiz-view').classList.remove('hidden');
             
             renderQuestion();
         }
 
         function renderQuestion() {
             selectedOptionIndex = null;
-            nextButtonContainer.classList.add('hidden');
+            document.getElementById('next-button-container').classList.add('hidden');
             
             const currentQ = shuffledQuestions[currentQuestionIndex];
             
             // Update Progress
-            progressText.innerText = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
-            progressBar.style.width = `${(currentQuestionIndex / shuffledQuestions.length) * 100}%`;
+            document.getElementById('progress-text').innerText = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+            document.getElementById('progress-bar').style.width = `${(currentQuestionIndex / shuffledQuestions.length) * 100}%`;
             
             // Render Question
-            questionText.innerText = currentQ.question;
+            document.getElementById('question-text').innerText = currentQ.question;
             
             // Render Options
+            const optionsContainer = document.getElementById('options-container');
             optionsContainer.innerHTML = '';
             
             currentQ.options.forEach((option, index) => {
@@ -532,7 +529,9 @@
                 
                 const btn = document.createElement('button');
                 btn.className = 'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer bg-white text-slate-700';
-                btn.onclick = () => handleOptionClick(index);
+                
+                // Use addEventListener instead of onclick
+                btn.addEventListener('click', () => handleOptionClick(index));
                 
                 const btnInner = document.createElement('div');
                 btnInner.className = 'flex justify-between items-center';
@@ -549,6 +548,7 @@
             });
 
             // Update Next button text based on question index
+            const nextBtn = document.getElementById('next-btn');
             if (currentQuestionIndex < shuffledQuestions.length - 1) {
                 nextBtn.innerHTML = `<span>Next Question</span> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
             } else {
@@ -567,6 +567,7 @@
             }
             
             // Re-render options to show states and feedback
+            const optionsContainer = document.getElementById('options-container');
             const optionDivs = optionsContainer.children;
             
             currentQ.options.forEach((option, i) => {
@@ -574,17 +575,21 @@
                 const btnInner = btn.querySelector('div');
                 
                 // Disable button
-                btn.onclick = null;
-                btn.className = 'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden cursor-default';
+                // Clone the node to remove existing event listeners safely
+                const newBtn = btn.cloneNode(true);
+                btn.parentNode.replaceChild(newBtn, btn);
+                
+                newBtn.className = 'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden cursor-default';
+                const newBtnInner = newBtn.querySelector('div');
                 
                 if (option.isCorrect) {
-                    btn.classList.add('border-green-500', 'bg-green-50', 'text-green-900');
-                    btnInner.innerHTML += icons.check;
+                    newBtn.classList.add('border-green-500', 'bg-green-50', 'text-green-900');
+                    newBtnInner.innerHTML += icons.check;
                 } else if (i === selectedOptionIndex) {
-                    btn.classList.add('border-red-500', 'bg-red-50', 'text-red-900');
-                    btnInner.innerHTML += icons.cross;
+                    newBtn.classList.add('border-red-500', 'bg-red-50', 'text-red-900');
+                    newBtnInner.innerHTML += icons.cross;
                 } else {
-                    btn.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-400', 'opacity-70');
+                    newBtn.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-400', 'opacity-70');
                 }
                 
                 // Create Feedback Block
@@ -601,7 +606,7 @@
             });
             
             // Show Next Button
-            nextButtonContainer.classList.remove('hidden');
+            document.getElementById('next-button-container').classList.remove('hidden');
         }
 
         function handleNextQuestion() {
@@ -609,4 +614,28 @@
                 currentQuestionIndex++;
                 renderQuestion();
                 // Scroll back to top of the quiz container smoothly
-                quizView.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                document.getElementById('quiz-view').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                renderResults();
+            }
+        }
+
+        function renderResults() {
+            document.getElementById('quiz-view').classList.add('hidden');
+            document.getElementById('results-view').classList.remove('hidden');
+            
+            document.getElementById('score-display').innerText = score;
+            document.getElementById('total-display').innerText = shuffledQuestions.length;
+            
+            const messageEl = document.getElementById('score-message');
+            if (score >= 35) {
+                messageEl.innerText = 'Excellent work!';
+            } else if (score >= 28) {
+                messageEl.innerText = 'Great job!';
+            } else {
+                messageEl.innerText = 'Good effort, keep reviewing!';
+            }
+        }
+    </script>
+</body>
+</html>
