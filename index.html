@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Respiratory System Mock Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen">
+
+    <!-- Container for all views -->
+    <div id="app-container" class="w-full flex items-center justify-center min-h-screen p-4">
+        
+        <!-- Intro View -->
+        <div id="intro-view" class="max-w-2xl bg-white rounded-2xl shadow-xl p-8 text-center border border-slate-100 w-full fade-in">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-4">Respiratory System Mock Test</h1>
+            <p class="text-base md:text-lg text-slate-600 mb-8">
+                This 40-item multiple-choice test strictly evaluates your knowledge based on the provided Respiratory System reviewer. 
+                Questions and options are randomized every time you take the test. Detailed feedback is provided for all choices upon answering.
+            </p>
+            <button onclick="startQuiz()" class="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all transform hover:scale-105 shadow-lg w-full md:w-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                Start Mock Test
+            </button>
+        </div>
+
+        <!-- Quiz View -->
+        <div id="quiz-view" class="max-w-3xl w-full hidden py-8 fade-in">
+            <!-- Header & Progress -->
+            <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800">Respiratory System</h1>
+                    <p class="text-sm text-slate-500 font-medium">Mock Test</p>
+                </div>
+                <div id="progress-text" class="bg-white px-4 py-2 rounded-full shadow-sm border border-slate-200 font-semibold text-blue-700 self-start md:self-auto text-sm md:text-base">
+                    Question 1 of 40
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="w-full bg-slate-200 rounded-full h-2.5 mb-8 overflow-hidden">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300 ease-out" style="width: 0%"></div>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-100 p-6 md:p-8 mb-6 transition-all">
+                <h2 id="question-text" class="text-xl md:text-2xl font-semibold mb-6 leading-relaxed">
+                    <!-- Question text goes here -->
+                </h2>
+
+                <div id="options-container" class="space-y-4">
+                    <!-- Options go here -->
+                </div>
+            </div>
+
+            <!-- Next Button Container -->
+            <div id="next-button-container" class="flex justify-end hidden fade-in">
+                <button onclick="handleNextQuestion()" id="next-btn" class="inline-flex w-full md:w-auto justify-center items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors shadow-md">
+                    <span>Next Question</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Results View -->
+        <div id="results-view" class="max-w-xl w-full bg-white rounded-2xl shadow-xl p-8 text-center border border-slate-100 hidden fade-in">
+            <h2 class="text-3xl font-bold text-blue-900 mb-2">Test Complete!</h2>
+            <p class="text-slate-500 mb-6">You have answered all questions.</p>
+            
+            <div class="bg-blue-50 rounded-xl p-8 mb-8 border border-blue-100">
+                <div class="text-5xl md:text-6xl font-extrabold text-blue-600 mb-2">
+                    <span id="score-display">0</span> <span class="text-2xl md:text-3xl text-blue-400">/ <span id="total-display">40</span></span>
+                </div>
+                <p id="score-message" class="text-lg font-medium text-blue-800">
+                    <!-- Score message goes here -->
+                </p>
+            </div>
+
+            <button onclick="startQuiz()" class="inline-flex w-full md:w-auto justify-center items-center gap-2 px-8 py-4 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-full transition-all shadow-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                Retake Test
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the main function of the respiratory system?",
+                options: [
+                { text: "To supply the body with oxygen and remove carbon dioxide.", isCorrect: true, feedback: "Correct. The material explicitly states that the main function is to supply the body with oxygen and remove carbon dioxide." },
+                { text: "To produce energy directly from food.", isCorrect: false, feedback: "Incorrect. While oxygen is needed by cells to produce energy, the respiratory system itself does not produce the energy; it only supplies the necessary oxygen." },
+                { text: "To transport gases throughout the bloodstream.", isCorrect: false, feedback: "Incorrect. Transporting gases in the blood is listed as the second phase of gas exchange, but the overall main function of the system is the supply of oxygen and removal of carbon dioxide." },
+                { text: "To digest metabolic waste products.", isCorrect: false, feedback: "Incorrect. The respiratory system removes carbon dioxide, which is a metabolic waste product, but it does not digest it." }
+                ]
+            },
+            {
+                question: "According to the text, why do cells need oxygen?",
+                options: [
+                { text: "To produce energy.", isCorrect: true, feedback: "Correct. The text specifically states that cells need oxygen to produce energy." },
+                { text: "To transport carbon dioxide.", isCorrect: false, feedback: "Incorrect. Oxygen is not used to transport carbon dioxide; carbon dioxide is a waste product that needs to be removed." },
+                { text: "To create new blood cells.", isCorrect: false, feedback: "Incorrect. The provided text mentions nothing about oxygen creating blood cells." },
+                { text: "To maintain lung structure.", isCorrect: false, feedback: "Incorrect. The material does not state that oxygen is used to maintain lung structure." }
+                ]
+            },
+            {
+                question: "What is carbon dioxide described as in the provided material?",
+                options: [
+                { text: "A waste product of metabolism.", isCorrect: true, feedback: "Correct. The material defines carbon dioxide explicitly as a waste product of metabolism." },
+                { text: "A primary source of energy.", isCorrect: false, feedback: "Incorrect. Oxygen is used to produce energy; carbon dioxide is the waste product of that process." },
+                { text: "A gas that cells need to survive.", isCorrect: false, feedback: "Incorrect. Cells need oxygen to survive and produce energy, not carbon dioxide." },
+                { text: "An active component of inhalation.", isCorrect: false, feedback: "Incorrect. Carbon dioxide is primarily associated with exhalation (removal from the body) rather than inhalation." }
+                ]
+            },
+            {
+                question: "Which sequence correctly traces the path of air entering the human body?",
+                options: [
+                { text: "Nose/mouth -> throat -> windpipe -> lungs.", isCorrect: true, feedback: "Correct. The text states air enters through the nose or mouth, passes through the throat and windpipe, and eventually reaches the lungs." },
+                { text: "Windpipe -> throat -> nose/mouth -> lungs.", isCorrect: false, feedback: "Incorrect. Air enters the nose/mouth first, not the windpipe." },
+                { text: "Nasal cavity -> alveoli -> bronchi -> trachea.", isCorrect: false, feedback: "Incorrect. Alveoli are the final destination where gas exchange occurs, not the second step." },
+                { text: "Throat -> larynx -> pharynx -> alveoli.", isCorrect: false, feedback: "Incorrect. This order is scrambled and skips major organs like the trachea and lungs." }
+                ]
+            },
+            {
+                question: "Which of the following organs is NOT listed as part of the respiratory system in the overview?",
+                options: [
+                { text: "Esophagus.", isCorrect: true, feedback: "Correct. The esophagus is not mentioned in the text as an organ of the respiratory system." },
+                { text: "Pharynx.", isCorrect: false, feedback: "Incorrect. The pharynx is explicitly listed as a respiratory organ." },
+                { text: "Larynx.", isCorrect: false, feedback: "Incorrect. The larynx is explicitly listed as a respiratory organ." },
+                { text: "Trachea.", isCorrect: false, feedback: "Incorrect. The trachea is explicitly listed as a respiratory organ." }
+                ]
+            },
+            {
+                question: "Where does gas exchange eventually occur in the human respiratory system?",
+                options: [
+                { text: "In the lungs.", isCorrect: true, feedback: "Correct. The text notes that air eventually reaches the lungs where gas exchange occurs." },
+                { text: "In the pharynx.", isCorrect: false, feedback: "Incorrect. The pharynx is part of the pathway for air, not the eventual site of gas exchange." },
+                { text: "In the nasal cavity.", isCorrect: false, feedback: "Incorrect. The nasal cavity is where air enters, not where final gas exchange occurs." },
+                { text: "In the trachea.", isCorrect: false, feedback: "Incorrect. The trachea (windpipe) is a passageway, not the site of gas exchange." }
+                ]
+            },
+            {
+                question: "What is the first phase of gas exchange?",
+                options: [
+                { text: "Breathing.", isCorrect: true, feedback: "Correct. 'Breathing' is explicitly listed as the first of the three phases of gas exchange." },
+                { text: "Transport of gases in the blood.", isCorrect: false, feedback: "Incorrect. This is listed as the second phase of gas exchange." },
+                { text: "Body tissues taking up oxygen.", isCorrect: false, feedback: "Incorrect. This is part of the third phase of gas exchange." },
+                { text: "Release of carbon dioxide.", isCorrect: false, feedback: "Incorrect. This is part of the third phase of gas exchange." }
+                ]
+            },
+            {
+                question: "What is the second phase of gas exchange?",
+                options: [
+                { text: "Transport of gases in the blood.", isCorrect: true, feedback: "Correct. This is explicitly listed as the second phase of gas exchange." },
+                { text: "Breathing.", isCorrect: false, feedback: "Incorrect. Breathing is the first phase." },
+                { text: "Inhalation and exhalation.", isCorrect: false, feedback: "Incorrect. These are mechanics of breathing, which falls under the first phase." },
+                { text: "Body tissues taking up oxygen.", isCorrect: false, feedback: "Incorrect. This is the third phase." }
+                ]
+            },
+            {
+                question: "What occurs during the third phase of gas exchange?",
+                options: [
+                { text: "Body tissues take up oxygen and release carbon dioxide.", isCorrect: true, feedback: "Correct. The text verbatim lists this as the third phase." },
+                { text: "Air moves in and out of the lungs.", isCorrect: false, feedback: "Incorrect. This describes breathing, which is the first phase." },
+                { text: "Gases are transported in the blood.", isCorrect: false, feedback: "Incorrect. This is the second phase." },
+                { text: "Air passes through the throat and windpipe.", isCorrect: false, feedback: "Incorrect. This is part of the physical pathway of air, related to breathing (phase 1)." }
+                ]
+            },
+            {
+                question: "Which statement accurately describes the nature of inhalation?",
+                options: [
+                { text: "It is always active.", isCorrect: true, feedback: "Correct. The text explicitly states, 'Inhalation is always active'." },
+                { text: "It is usually passive.", isCorrect: false, feedback: "Incorrect. Exhalation is usually passive, not inhalation." },
+                { text: "It is only active when attempting to take in more air.", isCorrect: false, feedback: "Incorrect. The text says it is *always* active." },
+                { text: "It requires no energy.", isCorrect: false, feedback: "Incorrect. 'Active' implies it requires effort or energy, contradicting this statement." }
+                ]
+            },
+            {
+                question: "Under normal conditions, what is the nature of exhalation?",
+                options: [
+                { text: "It is usually passive.", isCorrect: true, feedback: "Correct. The text explicitly states, 'Exhalation is usually passive'." },
+                { text: "It is always active.", isCorrect: false, feedback: "Incorrect. Inhalation is always active; exhalation is only active under specific conditions." },
+                { text: "It is always passive.", isCorrect: false, feedback: "Incorrect. The text says it is 'usually' passive, as it can become active." },
+                { text: "It requires immense amounts of energy.", isCorrect: false, feedback: "Incorrect. Usually being passive means it typically does not require immense energy." }
+                ]
+            },
+            {
+                question: "When does exhalation become active?",
+                options: [
+                { text: "When you attempt to expel more air.", isCorrect: true, feedback: "Correct. The text states, 'Exhalation becomes active when you attempt to expel more air'." },
+                { text: "During regular breathing.", isCorrect: false, feedback: "Incorrect. During regular breathing, exhalation is usually passive." },
+                { text: "When gases are transported in the blood.", isCorrect: false, feedback: "Incorrect. Gas transport is a different phase and doesn't trigger active exhalation." },
+                { text: "When body tissues release carbon dioxide.", isCorrect: false, feedback: "Incorrect. This is part of the cellular exchange phase, not the trigger for active exhalation." }
+                ]
+            },
+            {
+                question: "Which term is used to describe invertebrate respiration involving direct diffusion?",
+                options: [
+                { text: "Integumentary Exchange.", isCorrect: true, feedback: "Correct. The text associates invertebrate respiration directly with 'Integumentary Exchange / Direct Diffusion'." },
+                { text: "Tracheal System.", isCorrect: false, feedback: "Incorrect. The tracheal system is specifically shown for ants, while direct diffusion/integumentary exchange is a separate category." },
+                { text: "Book Lungs.", isCorrect: false, feedback: "Incorrect. Book lungs are a specific structure with folds and spiracles, separate from direct diffusion." },
+                { text: "Parabronchi.", isCorrect: false, feedback: "Incorrect. Parabronchi are found in birds, which are vertebrates, not invertebrates." }
+                ]
+            },
+            {
+                question: "During fish inhalation, what enters the fish's system?",
+                options: [
+                { text: "Water and Oxygen.", isCorrect: true, feedback: "Correct. The diagram explicitly labels the intake during inhaling as 'Water + Oxygen'." },
+                { text: "Water and Carbon Dioxide.", isCorrect: false, feedback: "Incorrect. Water and Carbon Dioxide are expelled during exhalation." },
+                { text: "Only Oxygen.", isCorrect: false, feedback: "Incorrect. The diagram specifies that both water and oxygen enter together." },
+                { text: "Fresh air.", isCorrect: false, feedback: "Incorrect. Fishes inhale a water and oxygen mixture, not air." }
+                ]
+            },
+            {
+                question: "What is the state of a fish's mouth and gill cover during inhalation?",
+                options: [
+                { text: "Mouth Open, Gill Cover Closed.", isCorrect: true, feedback: "Correct. The diagram for inhaling shows the 'Mouth Open' and the 'Gill Cover Closed'." },
+                { text: "Mouth Closed, Gill Cover Open.", isCorrect: false, feedback: "Incorrect. This is the state during exhalation, not inhalation." },
+                { text: "Mouth Open, Gill Cover Open.", isCorrect: false, feedback: "Incorrect. The gill cover must be closed during inhalation according to the diagram." },
+                { text: "Mouth Closed, Gill Cover Closed.", isCorrect: false, feedback: "Incorrect. The mouth must be open to take in water and oxygen." }
+                ]
+            },
+            {
+                question: "During fish exhalation, what is expelled from the fish's system?",
+                options: [
+                { text: "Water and Carbon Dioxide.", isCorrect: true, feedback: "Correct. The diagram explicitly labels the output during exhaling as 'Water + Carbon Dioxide'." },
+                { text: "Water and Oxygen.", isCorrect: false, feedback: "Incorrect. Water and Oxygen are taken in during inhalation." },
+                { text: "Only Carbon Dioxide.", isCorrect: false, feedback: "Incorrect. The diagram specifies that water is expelled along with carbon dioxide." },
+                { text: "Stale air.", isCorrect: false, feedback: "Incorrect. Fishes expel a water mixture, while 'stale air' is a term used in the bird diagram." }
+                ]
+            },
+            {
+                question: "What is the state of a fish's mouth and gill cover during exhalation?",
+                options: [
+                { text: "Mouth Closed, Gill Cover Open.", isCorrect: true, feedback: "Correct. The diagram for exhaling shows the 'Mouth Closed' and the 'Gill Cover Open'." },
+                { text: "Mouth Open, Gill Cover Closed.", isCorrect: false, feedback: "Incorrect. This is the state during inhalation, not exhalation." },
+                { text: "Mouth Open, Gill Cover Open.", isCorrect: false, feedback: "Incorrect. The mouth must be closed during exhalation according to the diagram." },
+                { text: "Mouth Closed, Gill Cover Closed.", isCorrect: false, feedback: "Incorrect. The gill cover must be open to let the water and carbon dioxide out." }
+                ]
+            },
+            {
+                question: "What serves as the entry point for air in an ant's respiratory system?",
+                options: [
+                { text: "Spiracle.", isCorrect: true, feedback: "Correct. The diagram showing how ants breathe indicates the 'Spiracle' as the entry point on the surface." },
+                { text: "Tracheae.", isCorrect: false, feedback: "Incorrect. The tracheae are the internal tubes that the air enters *after* passing through the spiracle." },
+                { text: "Book lungs.", isCorrect: false, feedback: "Incorrect. Book lungs are shown as a separate system, not the one used by ants." },
+                { text: "Gills.", isCorrect: false, feedback: "Incorrect. Gills are used by fish, not ants." }
+                ]
+            },
+            {
+                question: "In an ant's respiratory system, what structure connects directly to the spiracles?",
+                options: [
+                { text: "Tracheae.", isCorrect: true, feedback: "Correct. The diagram shows the 'Tracheae' branching directly inward from the 'Spiracle'." },
+                { text: "Alveoli.", isCorrect: false, feedback: "Incorrect. Alveoli are found in human/mammalian lungs, not in an ant's tracheal system." },
+                { text: "Parabronchi.", isCorrect: false, feedback: "Incorrect. Parabronchi are found in birds." },
+                { text: "Book lungs.", isCorrect: false, feedback: "Incorrect. Book lungs are a completely different respiratory structure." }
+                ]
+            },
+            {
+                question: "What is the overall name for the respiratory system used by ants?",
+                options: [
+                { text: "Tracheal System.", isCorrect: true, feedback: "Correct. The diagram illustrating how ants breathe is explicitly labeled 'Tracheal System'." },
+                { text: "Integumentary System.", isCorrect: false, feedback: "Incorrect. Integumentary exchange is a different method of invertebrate respiration." },
+                { text: "Book Lung System.", isCorrect: false, feedback: "Incorrect. Book lungs are a separate system shown in a different diagram." },
+                { text: "Alveolar System.", isCorrect: false, feedback: "Incorrect. Alveoli are part of the human/mammalian respiratory system." }
+                ]
+            },
+            {
+                question: "In organisms with book lungs, how does air flow into the system?",
+                options: [
+                { text: "In through spiracles.", isCorrect: true, feedback: "Correct. The diagram for book lungs explicitly states 'Air flowing in through spiracles'." },
+                { text: "Through the mouth.", isCorrect: false, feedback: "Incorrect. The diagram points to spiracles as the entry point, not a mouth." },
+                { text: "Across the skin.", isCorrect: false, feedback: "Incorrect. Diffusion across the skin is characteristic of frogs or integumentary exchange, not book lungs." },
+                { text: "Through tracheae.", isCorrect: false, feedback: "Incorrect. While tracheae connect to spiracles in ants, the specific label for air entry in book lungs is 'through spiracles'." }
+                ]
+            },
+            {
+                question: "What structural feature is noted within book lungs where blood flows?",
+                options: [
+                { text: "Between folds.", isCorrect: true, feedback: "Correct. The diagram for book lungs includes the label 'Blood flow between folds'." },
+                { text: "Through branching tubes.", isCorrect: false, feedback: "Incorrect. Branching tubes are characteristic of human lungs and the ant's tracheal system." },
+                { text: "Inside tiny open-ended tubes.", isCorrect: false, feedback: "Incorrect. Open-ended tubes (parabronchi) belong to the bird respiratory system." },
+                { text: "Across a high surface area of capillaries.", isCorrect: false, feedback: "Incorrect. While capillaries have a high surface area in humans, the specific feature labeled for book lungs is 'folds'." }
+                ]
+            },
+            {
+                question: "According to the text, which of the following groups have paired lungs?",
+                options: [
+                { text: "Some fishes, most amphibians, and all mammals and birds.", isCorrect: true, feedback: "Correct. The text explicitly lists exactly these groups as having paired lungs." },
+                { text: "All fishes, all amphibians, and all mammals.", isCorrect: false, feedback: "Incorrect. The text specifies 'some fishes' and 'most amphibians', not all." },
+                { text: "Only mammals and birds.", isCorrect: false, feedback: "Incorrect. The text also includes some fishes and most amphibians." },
+                { text: "All invertebrates and vertebrates.", isCorrect: false, feedback: "Incorrect. The text does not state that invertebrates have paired lungs." }
+                ]
+            },
+            {
+                question: "How do frogs primarily take up oxygen?",
+                options: [
+                { text: "Through the lungs.", isCorrect: true, feedback: "Correct. The text explicitly states for frogs: 'oxygen uptake through the lungs'." },
+                { text: "Across the skin.", isCorrect: false, feedback: "Incorrect. Frogs diffuse carbon dioxide across the skin, but take up oxygen through the lungs." },
+                { text: "Through gills.", isCorrect: false, feedback: "Incorrect. The text does not mention gills for frogs." },
+                { text: "Through spiracles.", isCorrect: false, feedback: "Incorrect. Spiracles are used by ants and in book lungs, not by frogs." }
+                ]
+            },
+            {
+                question: "How does carbon dioxide leave a frog's body?",
+                options: [
+                { text: "It diffuses across the skin.", isCorrect: true, feedback: "Correct. The text explicitly states for frogs: 'carbon dioxide diffuses across the skin'." },
+                { text: "It is exhaled through the lungs.", isCorrect: false, feedback: "Incorrect. The text specifies the skin for carbon dioxide diffusion, not the lungs." },
+                { text: "It is pumped out by air sacs.", isCorrect: false, feedback: "Incorrect. Air sacs are a feature of birds, not frogs." },
+                { text: "It exits through spiracles.", isCorrect: false, feedback: "Incorrect. Spiracles are not a feature of frog respiration mentioned in the text." }
+                ]
+            },
+            {
+                question: "Which vertebrates have the most efficient respiratory system?",
+                options: [
+                { text: "Birds.", isCorrect: true, feedback: "Correct. The text states, 'Birds have the most efficient respiratory system of all vertebrates'." },
+                { text: "Mammals.", isCorrect: false, feedback: "Incorrect. Birds are explicitly stated to have the most efficient system, unlike mammals." },
+                { text: "Amphibians.", isCorrect: false, feedback: "Incorrect. The text identifies birds as having the most efficient system." },
+                { text: "Fishes.", isCorrect: false, feedback: "Incorrect. The text identifies birds as having the most efficient system." }
+                ]
+            },
+            {
+                question: "Why do birds require such an efficient respiratory system?",
+                options: [
+                { text: "Because flight requires immense amounts of energy.", isCorrect: true, feedback: "Correct. The text explains that they have the most efficient system 'because flight requires immense amounts of energy'." },
+                { text: "Because they live at high altitudes.", isCorrect: false, feedback: "Incorrect. The provided material does not mention high altitudes as the reason." },
+                { text: "Because their lungs are smaller than mammals.", isCorrect: false, feedback: "Incorrect. The material does not compare the physical size of bird and mammal lungs." },
+                { text: "Because they have blind-ended alveoli.", isCorrect: false, feedback: "Incorrect. Birds do not have blind-ended alveoli; they have open-ended parabronchi." }
+                ]
+            },
+            {
+                question: "Unlike mammals, what type of airflow do birds have?",
+                options: [
+                { text: "Unidirectional airflow.", isCorrect: true, feedback: "Correct. The text explicitly states, 'Unlike mammals, birds have unidirectional airflow'." },
+                { text: "Bidirectional airflow.", isCorrect: false, feedback: "Incorrect. The text specifies their airflow is unidirectional." },
+                { text: "Passive airflow.", isCorrect: false, feedback: "Incorrect. The text refers to it as unidirectional, not passive." },
+                { text: "Direct diffusion.", isCorrect: false, feedback: "Incorrect. Direct diffusion is associated with invertebrates, not birds." }
+                ]
+            },
+            {
+                question: "How many air sacs do birds possess?",
+                options: [
+                { text: "7-9 posterior and anterior air sacs.", isCorrect: true, feedback: "Correct. The text states exactly that 'Birds possess 7-9 posterior and anterior air sacs'." },
+                { text: "2-4 posterior and anterior air sacs.", isCorrect: false, feedback: "Incorrect. The text specifies 7-9 air sacs." },
+                { text: "10-12 posterior and anterior air sacs.", isCorrect: false, feedback: "Incorrect. The text specifies 7-9 air sacs." },
+                { text: "Only 1 large anterior air sac.", isCorrect: false, feedback: "Incorrect. The text states they have 7-9 posterior and anterior air sacs." }
+                ]
+            },
+            {
+                question: "What is the primary function of a bird's air sacs?",
+                options: [
+                { text: "They act like bellows to pump air through the lungs.", isCorrect: true, feedback: "Correct. The text states they 'act like bellows to pump air through the lungs'." },
+                { text: "They perform gas exchange.", isCorrect: false, feedback: "Incorrect. The text explicitly notes, 'These do not perform gas exchange'." },
+                { text: "They store carbon dioxide for expulsion.", isCorrect: false, feedback: "Incorrect. The text does not mention them storing carbon dioxide." },
+                { text: "They diffuse oxygen directly into the blood.", isCorrect: false, feedback: "Incorrect. Gas exchange does not happen in the air sacs." }
+                ]
+            },
+            {
+                question: "Do bird air sacs perform gas exchange?",
+                options: [
+                { text: "No, they do not perform gas exchange.", isCorrect: true, feedback: "Correct. The text explicitly states, 'These do not perform gas exchange'." },
+                { text: "Yes, they are the primary site of gas exchange.", isCorrect: false, feedback: "Incorrect. The text states the opposite." },
+                { text: "Yes, but only for carbon dioxide.", isCorrect: false, feedback: "Incorrect. They perform no gas exchange at all." },
+                { text: "Yes, but only during exhalation.", isCorrect: false, feedback: "Incorrect. They perform no gas exchange at all." }
+                ]
+            },
+            {
+                question: "Instead of alveoli, what structures do bird lungs contain?",
+                options: [
+                { text: "Tiny open-ended tubes called parabronchi.", isCorrect: true, feedback: "Correct. The text states that bird lungs contain 'tiny open-ended tubes called parabronchi'." },
+                { text: "Blind-ended tubes called tracheae.", isCorrect: false, feedback: "Incorrect. Tracheae are part of the main airway (or in ants), and bird tubes are open-ended parabronchi." },
+                { text: "Folds called book lungs.", isCorrect: false, feedback: "Incorrect. Book lungs belong to certain invertebrates, not birds." },
+                { text: "Branching tubes with high surface area capillaries.", isCorrect: false, feedback: "Incorrect. While they have tubes, the specific replacement for alveoli mentioned in the text is 'parabronchi'." }
+                ]
+            },
+            {
+                question: "How are human alveoli described structurally compared to bird parabronchi?",
+                options: [
+                { text: "Alveoli are blind-ended, whereas parabronchi are open-ended.", isCorrect: true, feedback: "Correct. The text contrasts them by saying, 'Instead of blind-ended alveoli, bird lungs contain tiny open-ended tubes called parabronchi'." },
+                { text: "Alveoli are open-ended, whereas parabronchi are blind-ended.", isCorrect: false, feedback: "Incorrect. This is the exact opposite of what the text states." },
+                { text: "Both are blind-ended.", isCorrect: false, feedback: "Incorrect. The text specifically calls parabronchi 'open-ended'." },
+                { text: "Both are open-ended.", isCorrect: false, feedback: "Incorrect. The text specifically calls alveoli 'blind-ended'." }
+                ]
+            },
+            {
+                question: "How many breath cycles does it take for a single 'packet' of air to move through a bird's system?",
+                options: [
+                { text: "Two full inhalations and exhalations.", isCorrect: true, feedback: "Correct. The text defines the 'Two-Cycle Breath' as taking two full inhalations and exhalations." },
+                { text: "One full inhalation and exhalation.", isCorrect: false, feedback: "Incorrect. The text states it takes two full cycles, not one." },
+                { text: "Three full inhalations and exhalations.", isCorrect: false, feedback: "Incorrect. The text specifies it takes two." },
+                { text: "Half a breath cycle.", isCorrect: false, feedback: "Incorrect. The text specifies it takes two full cycles." }
+                ]
+            },
+            {
+                question: "What is the primary benefit of the bird's two-cycle breath?",
+                options: [
+                { text: "It ensures the lungs always receive fresh, oxygenated air, even during exhalation.", isCorrect: true, feedback: "Correct. The text states exactly this: 'This ensures the lungs are always receiving fresh, oxygenated air-even during exhalation'." },
+                { text: "It allows the bird to hold its breath longer underwater.", isCorrect: false, feedback: "Incorrect. The text mentions this in the context of flight energy, not underwater breath-holding." },
+                { text: "It reduces the amount of carbon dioxide produced by the body.", isCorrect: false, feedback: "Incorrect. The breathing cycle doesn't change metabolic CO2 production." },
+                { text: "It cools the bird's body during flight.", isCorrect: false, feedback: "Incorrect. While plausibly true biologically, the provided text does not mention cooling." }
+                ]
+            },
+            {
+                question: "Where are the lungs located in the human respiratory system?",
+                options: [
+                { text: "In the chest cavity.", isCorrect: true, feedback: "Correct. The text states branching tubes convey air to lungs 'located in the chest cavity'." },
+                { text: "In the nasal cavity.", isCorrect: false, feedback: "Incorrect. The nasal cavity is where air enters, not where the lungs are located." },
+                { text: "In the pharynx.", isCorrect: false, feedback: "Incorrect. The pharynx is the throat, not the location of the lungs." },
+                { text: "In the anterior air sacs.", isCorrect: false, feedback: "Incorrect. Anterior air sacs are a feature of birds, not humans." }
+                ]
+            },
+            {
+                question: "How is air conveyed to the human lungs?",
+                options: [
+                { text: "By branching tubes.", isCorrect: true, feedback: "Correct. The text states, 'branching tubes convey air to lungs'." },
+                { text: "By direct diffusion across the skin.", isCorrect: false, feedback: "Incorrect. Direct diffusion is for invertebrates or frogs, not human lungs." },
+                { text: "By posterior air sacs.", isCorrect: false, feedback: "Incorrect. Air sacs are a feature of birds." },
+                { text: "By the diaphragm pumping exclusively.", isCorrect: false, feedback: "Incorrect. While the diaphragm is mentioned in a diagram, the text specifically says 'branching tubes convey air'." }
+                ]
+            },
+            {
+                question: "Why are alveoli well adapted for gas exchange?",
+                options: [
+                { text: "Because they have a high surface area.", isCorrect: true, feedback: "Correct. The text lists 'High surface area of alveoli' as a reason they are well adapted." },
+                { text: "Because they are open-ended tubes.", isCorrect: false, feedback: "Incorrect. Bird parabronchi are open-ended; human alveoli are blind-ended." },
+                { text: "Because they act like bellows.", isCorrect: false, feedback: "Incorrect. Bird air sacs act like bellows, not human alveoli." },
+                { text: "Because they actively pump blood.", isCorrect: false, feedback: "Incorrect. Alveoli do not pump blood; the text notes the high surface area of capillaries around them." }
+                ]
+            },
+            {
+                question: "In the human alveoli, what is the movement of oxygen?",
+                options: [
+                { text: "It diffuses into the blood.", isCorrect: true, feedback: "Correct. The text states explicitly: 'In alveoli O2 diffuses into the blood'." },
+                { text: "It diffuses out of the blood.", isCorrect: false, feedback: "Incorrect. Carbon dioxide diffuses out of the blood; oxygen diffuses into it." },
+                { text: "It diffuses across the skin.", isCorrect: false, feedback: "Incorrect. Diffusion across the skin happens in frogs, not in human alveoli." },
+                { text: "It remains in the alveoli to act as a bellow.", isCorrect: false, feedback: "Incorrect. Bellows are bird air sacs; oxygen must diffuse into the blood for transport." }
+                ]
+            },
+            {
+                question: "In the human alveoli, what is the movement of carbon dioxide?",
+                options: [
+                { text: "It diffuses out of the blood.", isCorrect: true, feedback: "Correct. The text states explicitly: 'In alveoli CO2 diffuses out of the blood'." },
+                { text: "It diffuses into the blood.", isCorrect: false, feedback: "Incorrect. Oxygen diffuses into the blood; carbon dioxide diffuses out of it." },
+                { text: "It is transported to body tissues.", isCorrect: false, feedback: "Incorrect. Oxygen is transported to body tissues; carbon dioxide is a waste product brought from tissues to the alveoli to be expelled." },
+                { text: "It is absorbed by the parabronchi.", isCorrect: false, feedback: "Incorrect. Parabronchi are in birds; the question asks about human alveoli." }
+                ]
+            }
+        ];
+
+        // State variables
+        let shuffledQuestions = [];
+        let currentQuestionIndex = 0;
+        let selectedOptionIndex = null;
+        let score = 0;
+
+        // DOM Elements
+        const introView = document.getElementById('intro-view');
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        
+        const progressText = document.getElementById('progress-text');
+        const progressBar = document.getElementById('progress-bar');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextButtonContainer = document.getElementById('next-button-container');
+        const nextBtn = document.getElementById('next-btn');
+
+        // Utility to shuffle array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // SVG Icons
+        const icons = {
+            check: `<svg class="w-6 h-6 text-green-600 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+            cross: `<svg class="w-6 h-6 text-red-500 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`
+        };
+
+        function startQuiz() {
+            // Shuffle questions and their options
+            shuffledQuestions = shuffleArray(quizData).map(q => ({
+                ...q,
+                options: shuffleArray(q.options)
+            }));
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            
+            // Switch views
+            introView.classList.add('hidden');
+            resultsView.classList.add('hidden');
+            quizView.classList.remove('hidden');
+            
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            selectedOptionIndex = null;
+            nextButtonContainer.classList.add('hidden');
+            
+            const currentQ = shuffledQuestions[currentQuestionIndex];
+            
+            // Update Progress
+            progressText.innerText = `Question ${currentQuestionIndex + 1} of ${shuffledQuestions.length}`;
+            progressBar.style.width = `${(currentQuestionIndex / shuffledQuestions.length) * 100}%`;
+            
+            // Render Question
+            questionText.innerText = currentQ.question;
+            
+            // Render Options
+            optionsContainer.innerHTML = '';
+            
+            currentQ.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'flex flex-col';
+                
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden border-slate-200 hover:border-blue-400 hover:bg-blue-50 cursor-pointer bg-white text-slate-700';
+                btn.onclick = () => handleOptionClick(index);
+                
+                const btnInner = document.createElement('div');
+                btnInner.className = 'flex justify-between items-center';
+                
+                const textSpan = document.createElement('span');
+                textSpan.className = 'text-base md:text-lg font-medium relative z-10 pr-8';
+                textSpan.innerText = option.text;
+                
+                btnInner.appendChild(textSpan);
+                btn.appendChild(btnInner);
+                optionDiv.appendChild(btn);
+                
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            // Update Next button text based on question index
+            if (currentQuestionIndex < shuffledQuestions.length - 1) {
+                nextBtn.innerHTML = `<span>Next Question</span> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+            } else {
+                nextBtn.innerHTML = `<span>View Results</span> <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`;
+            }
+        }
+
+        function handleOptionClick(index) {
+            if (selectedOptionIndex !== null) return; // Prevent double answering
+            
+            selectedOptionIndex = index;
+            const currentQ = shuffledQuestions[currentQuestionIndex];
+            
+            if (currentQ.options[index].isCorrect) {
+                score++;
+            }
+            
+            // Re-render options to show states and feedback
+            const optionDivs = optionsContainer.children;
+            
+            currentQ.options.forEach((option, i) => {
+                const btn = optionDivs[i].querySelector('button');
+                const btnInner = btn.querySelector('div');
+                
+                // Disable button
+                btn.onclick = null;
+                btn.className = 'w-full text-left p-4 rounded-xl border-2 transition-all duration-200 relative overflow-hidden cursor-default';
+                
+                if (option.isCorrect) {
+                    btn.classList.add('border-green-500', 'bg-green-50', 'text-green-900');
+                    btnInner.innerHTML += icons.check;
+                } else if (i === selectedOptionIndex) {
+                    btn.classList.add('border-red-500', 'bg-red-50', 'text-red-900');
+                    btnInner.innerHTML += icons.cross;
+                } else {
+                    btn.classList.add('border-slate-200', 'bg-slate-50', 'text-slate-400', 'opacity-70');
+                }
+                
+                // Create Feedback Block
+                const feedbackDiv = document.createElement('div');
+                const isCorrectStr = option.isCorrect ? 'Correct: ' : 'Incorrect: ';
+                const feedbackText = option.feedback.replace(/^(Correct\.|Incorrect\.)\s*/, '');
+                
+                feedbackDiv.className = `mt-2 p-4 rounded-lg text-sm leading-relaxed border-l-4 fade-in ${
+                    option.isCorrect ? 'bg-green-50 border-green-500 text-green-800' : 'bg-red-50 border-red-400 text-red-800'
+                }`;
+                
+                feedbackDiv.innerHTML = `<span class="font-bold">${isCorrectStr}</span>${feedbackText}`;
+                optionDivs[i].appendChild(feedbackDiv);
+            });
+            
+            // Show Next Button
+            nextButtonContainer.classList.remove('hidden');
+        }
+
+        function handleNextQuestion() {
+            if (currentQuestionIndex < shuffledQuestions.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+                // Scroll back to top of the quiz container smoothly
+                quizView.scrollIntoView({ behavior: 'smooth', block: 'start' });
